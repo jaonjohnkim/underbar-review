@@ -275,8 +275,8 @@
 
     iterator = iterator || _.identity;
     return !_.every(collection, (val) => {
-      return !val;    
-    });     
+      return !iterator(val);    
+    });  
   };
 
 
@@ -377,17 +377,10 @@
   _.memoize = function(func) {
     // declare a variable that will act as storage
     // return a function that will have access to the storage variable
-
-    let wasRan = true;
-
-    if (wasRan) {
-      
-      wasRan = false;
-    }
-
     let storage = {};
 
-    return function(func) {
+    return function() {
+      let param = JSON.stringify(arguments);
       // { 
       //    functionName1 : {
       //        parameter1 : answer1,
@@ -400,11 +393,15 @@
       // }
       // storage[functionName1][parameter1] => returns answer1
       
-      if (storage[func])
-      
+      if (storage[func] !== undefined && storage[func][param] !== undefined) {
+        return storage[func][param];
+      } else {
+        storage[func] = {};  
+      }
+      var result = func.apply(this, arguments);
+      storage[func][param] = result;
+      return result;
     };
-
-
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -414,6 +411,9 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    setTimeout(() => {
+      func.apply(this, Array.from(arguments).slice(2));
+    }, wait);
   };
 
 
@@ -428,6 +428,14 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var original = array.slice();
+    var rearranged = [];
+    for (let i = 0; i < original.length; i++) {
+      
+      let newIndex = Math.random() * rearranged.length;
+      rearranged.splice(newIndex, 0, original[i]);
+    }
+    return rearranged;
   };
 
 

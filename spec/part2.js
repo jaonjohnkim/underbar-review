@@ -151,7 +151,7 @@
       it('should fail for a set containing no matching values', function() {
         // Replace this line with an `expect` statement that tests
         // the behavior described by the `it` string
-        expect(_.some(['a', 'b', 'c'], 1)).to.be.false;
+        expect(_.some([undefined, undefined, undefined], _.identity)).to.be.false;
       });
 
       it('should pass for a collection containing one matching value', function() {
