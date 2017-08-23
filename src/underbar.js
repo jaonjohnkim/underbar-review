@@ -216,51 +216,23 @@
       //return accumulator + value
     //return accumulator
 
-    // if (accumulator === undefined) {
-    //   accumulator = collection[0];
-    //   console.log("Given collection: " + collection + ", sliced: " + collection.slice(1));
-    //   _.each(collection.slice(1), (val) => {
+    let helper = function (array) {
+      _.each(array, (val) => {
+        let result = iterator(accumulator, val);
+        if (result !== undefined) {
+          accumulator = result;
+        }
+      });
+    };
 
-    //     // check if the return of the iterator is undefined
-    //     if (iterator(accumulator, val) !== undefined) {
-    //       accumulator = iterator(accumulator, val);
-    //     }
-    //   });
-    // } else {
-    //   _.each(collection, (val) => {
-    //     if (iterator(accumulator, val) !== undefined) {
-    //       accumulator = iterator(accumulator, val);
-    //     }
-    //   });
-    // }
-    
-    // return accumulator;
-    
     if (accumulator === undefined) {
       accumulator = collection[0];
-    
-      for (let i = 1; i < collection.length; i++) {
-        let result = iterator(accumulator, collection[i]);
-        if (result !== undefined) {
-          accumulator = result;
-        }
-
-      }
-
-
+      helper(collection.slice(1));
     } else {
-      for (let i = 0; i < collection.length; i++) {
-        let result = iterator(accumulator, collection[i]);
-        if (result !== undefined) {
-          accumulator = result;
-        }
-
-      }
+      helper(collection);
     }
 
     return accumulator;
-
-    
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -275,16 +247,36 @@
     }, false);
   };
 
-
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    // set the accumulator to true initially
+    // iterate through collection and if ever false, then always false
+    // at the end return accumulator
+    if (collection.length === 0) { return true; }
+    iterator = iterator || _.identity;
+    return _.reduce(collection, (acc, val) => {
+      if (!acc) {
+        return false;
+      } else if (iterator(val)) {
+        return true;
+      }
+      return false;
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    // set default to iterator if not provided
+    //send iterator to _every
+    // return !_.every(collection, iterator)
+
+    iterator = iterator || _.identity;
+    return !_.every(collection, (val) => {
+      return !val;    
+    });     
   };
 
 
@@ -300,18 +292,46 @@
   //
   // Example:
   //   var obj1 = {key1: "something"};
+
   //   _.extend(obj1, {
-  //     key2: "something new",
-  //     key3: "something else new"
-  //   }, {
-  //     bla: "even more stuff"
-  //   }); // obj1 now contains key1, key2, key3 and bla
+  //        key2: "something new",
+  //        key3: "something else new"
+  //      }, {
+  //        bla: "even more stuff"
+  //     }
+  //   ); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    //Give object properties to another object
+    // if arguments.length === 1 return object
+    // loop through arguments
+      // on each argument, loop through each keys and obj[key] = argument[key] 
+    // return obj
+    
+    if (arguments.length === 1) { return obj; }
+    
+    _.each(Array.from(arguments).slice(1), (val, i) => {
+      _.each(val, (value, key) => {
+        obj[key] = value;
+      });
+    });
+
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    if (arguments.length === 1) { return obj; }
+    
+    _.each(Array.from(arguments).slice(1), (val, i) => {
+      _.each(val, (value, key) => {
+        if (obj[key] === undefined) {
+          obj[key] = value;
+        }
+      });
+    });
+
+    return obj;
   };
 
 
@@ -355,6 +375,36 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    // declare a variable that will act as storage
+    // return a function that will have access to the storage variable
+
+    let wasRan = true;
+
+    if (wasRan) {
+      
+      wasRan = false;
+    }
+
+    let storage = {};
+
+    return function(func) {
+      // { 
+      //    functionName1 : {
+      //        parameter1 : answer1,
+      //        parameter2 : answer2
+      //      },
+      //    functionName2 : {
+      //        parameter1 : answer1,
+      //        parameter2 : answer2
+      //      }
+      // }
+      // storage[functionName1][parameter1] => returns answer1
+      
+      if (storage[func])
+      
+    };
+
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
